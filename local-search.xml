@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>【hexo博客使用】1、首次使用hexo书写博客</title>
+    <link href="/2025/02/12/newpage1/"/>
+    <url>/2025/02/12/newpage1/</url>
+    
+    <content type="html"><![CDATA[<hr><h2 id="尝试使用hexo书写博客（不懂问deepseek）"><a href="#尝试使用hexo书写博客（不懂问deepseek）" class="headerlink" title="尝试使用hexo书写博客（不懂问deepseek）"></a>尝试使用hexo书写博客（不懂问deepseek）</h2><h3 id="hexo命令相关"><a href="#hexo命令相关" class="headerlink" title="hexo命令相关"></a>hexo命令相关</h3><ul><li>在blog根目录下打开CMD窗口，输入<strong>hexo new newpage1（hexo new page np1,创建新页面）</strong>,找到&#x2F;source文件下同名的markdown文件，进行编写。</li><li>编写完成后，使用命令更新本地hexo网页。</li><li>输入命令 <code>hexo clean</code> <code>hexo generate </code>   <code>hexo server</code> 检测本地网页是否修改成功。</li><li><strong>输入命令 <code>hexo 命令 --debug</code> 对命令进行详细步骤输出</strong> <em><strong>（报错时一定要使用该命令定位问题文件）</strong></em></li></ul><h3 id="使用git命令推送至github网页端"><a href="#使用git命令推送至github网页端" class="headerlink" title="使用git命令推送至github网页端"></a>使用git命令推送至github网页端</h3><ul><li>在blog根目录下打开CMD窗口，输入以下命令：</li></ul><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">git add .<br>git commit -m <span class="hljs-string">&quot;new page1&quot;</span><br>git push<br></code></pre></td></tr></table></figure><ul><li>在<a href="https://eternityalpha.github.io/">个人github博客</a>中访问是否修改成功。</li></ul><h3 id="参考学习网站"><a href="#参考学习网站" class="headerlink" title="参考学习网站"></a>参考学习网站</h3><p><a href="https://hexo.fluid-dev.com/docs/guide/#%E5%85%B3%E4%BA%8E%E6%8C%87%E5%8D%97">fluid主题用户手册</a><br><a href="https://youlan-lan.github.io/2021/06/07/Hexo%20%E4%B8%BB%E9%A2%98%E4%B9%8B%20Fluid/">fluid主题简单配置1</a><br><a href="https://www.cnblogs.com/xiacuncun/p/18313983">fluid主题简单配置2</a><br><a href="https://www.cnblogs.com/cxfs/p/16620809.html">live2D看板娘配置1</a><br><a href="https://istomoyo.github.io/posts/63693.html">live2D看板娘配置2</a><br><a href="https://xinchuang.csdn.net/654c335591098a104127546d.html?dp_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MzIyNjU1OCwiZXhwIjoxNzM5OTQwMTI0LCJpYXQiOjE3MzkzMzUzMjQsInVzZXJuYW1lIjoid2VpeGluXzQ5Njg4NTk3In0.dNPsO-lop8nQRWnIsDYfmDloXqjYbDKH0LmRrsuz2OI&spm=1001.2101.3001.6650.3&utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~activity-3-82729029-blog-132299299.235%5Ev43%5Epc_blog_bottom_relevance_base2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~activity-3-82729029-blog-132299299.235%5Ev43%5Epc_blog_bottom_relevance_base2#devmenu16">hexo网站搭建部署教程-github和coding</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>hexo usage</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>HTML</tag>
+      
+      <tag>Hexo</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Hello World</title>
     <link href="/2025/02/12/hello-world/"/>
     <url>/2025/02/12/hello-world/</url>

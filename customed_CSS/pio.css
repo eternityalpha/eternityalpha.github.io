@@ -1,0 +1,165 @@
+/* ----
+# Pio Plugin
+# By: Dreamer-Paul
+# Last Update: 2021.3.3
+
+# 一个支持更换 Live2D 模型的 Typecho 插件。
+---- */
+
+/* 插件容器 */
+.pio-container {
+    bottom: 20px; /* 距离页面底部 20px */
+    color: #666; /* 文本颜色 */
+    position: fixed; /* 固定定位 */
+    user-select: none; /* 禁止用户选择文本 */
+    z-index: 9999; /* 确保插件在最上层 */
+}
+
+/* 显示按钮（隐藏状态下的按钮） */
+.pio-container .pio-show {
+    left: -1em; /* 初始位置偏左 */
+    bottom: 1em; /* 距离底部 1em */
+    width: 3em; /* 宽度 */
+    height: 3em; /* 高度 */
+    display: none; /* 默认隐藏 */
+    cursor: pointer; /* 鼠标指针为手型 */
+    position: absolute; /* 绝对定位 */
+    border-radius: 3em; /* 圆形按钮 */
+    border: 3px solid #fff; /* 白色边框 */
+    transition: transform .3s; /* 悬停时的动画效果 */
+    background: url(avatar.jpg) center/contain; /* 背景图片 */
+    visibility: visible; /* 可见 */
+}
+
+/* Live2D 模型容器 */
+#pio {
+    cursor: grab; /* 鼠标指针为抓取手型 */
+}
+
+/* 当模型被拖动时 */
+#pio:active {
+    cursor: grabbing; /* 鼠标指针为抓取中手型 */
+}
+
+/* 当插件处于隐藏状态时，显示按钮 */
+.pio-container.hidden .pio-show {
+    display: block; /* 显示按钮 */
+}
+
+/* 当插件处于隐藏状态时，隐藏模型 */
+.pio-container.hidden #pio {
+    display: none; /* 隐藏模型 */
+}
+
+/* 当插件处于隐藏状态时，按钮悬停效果 */
+.pio-container.hidden .pio-show:hover {
+    transform: translateX(.5em); /* 向右移动 */
+}
+
+/* 插件容器定位在左侧 */
+.pio-container.left { left: 0; }
+
+/* 插件容器定位在右侧 */
+.pio-container.right { right: 0; }
+
+/* 当插件处于活动状态时 */
+.pio-container.active { cursor: move; } /* 鼠标指针为移动手型 */
+
+/* 当插件处于静态状态时 */
+.pio-container.static { pointer-events: none; } /* 禁用所有指针事件 */
+
+/* 操作按钮容器 */
+.pio-container .pio-action {
+    top: 3em; /* 距离顶部 3em */
+    opacity: 0; /* 默认透明 */
+    position: absolute; /* 绝对定位 */
+    transition: opacity .3s; /* 透明度变化动画 */
+}
+
+/* 操作按钮在左侧时的位置 */
+.pio-container.left .pio-action { right: 0; }
+
+/* 操作按钮在右侧时的位置 */
+.pio-container.right .pio-action { left: 0; }
+
+/* 当插件容器悬停时，显示操作按钮 */
+.pio-container:hover .pio-action { opacity: 1; }
+
+/* 操作按钮的通用样式 */
+.pio-action span {
+    color: #fff; /* 文本颜色 */
+    width: 1.5em; /* 宽度 */
+    height: 1.5em; /* 高度 */
+    display: block; /* 块级元素 */
+    cursor: pointer; /* 鼠标指针为手型 */
+    text-align: center; /* 文本居中 */
+    border-radius: 66%; /* 圆形按钮 */
+    margin-bottom: .5em; /* 底部外边距 */
+    border: 1px solid #666; /* 边框 */
+    background: #fff center/70% no-repeat; /* 背景图片 */
+}
+
+/* 首页按钮的背景图片 */
+.pio-action .pio-home {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTg5My43IDUwNS45SDEyOS4zYy0xMyAwLTI0LjgtNy45LTI5LjgtMTkuOS01LTEyLTIuMi0yNS45IDctMzUuMmwzMDctMzA3YzI2LjEtMjYuMSA2MC45LTQwLjUgOTgtNDAuNXM3MS45IDE0LjQgOTggNDAuNWwzMDcgMzA3YzkuMiA5LjIgMTIgMjMuMSA3IDM1LjItNSAxMi4xLTE2LjcgMTkuOS0yOS44IDE5Ljl6TTY3My4yIDkxOS45aC0zMS41Yy0xNy44IDAtMzIuMy0xNC40LTMyLjMtMzIuM3YtNzcuNGMwLTIzLjEtMTguOC00Mi4xLTQxLjktNDIuNC0yMi4zIDAuMy00MS4xIDE5LjMtNDEuMSA0Mi40djc3LjRjMCAxNy44LTE0LjQgMzIuMy0zMi4zIDMyLjNIMzQ5LjhjLTcwLjkgMC0xMjguNy02My43LTEyOC43LTE0MS45VjU4MS45YzAtMTcuOCAxNC40LTMyLjMgMzIuMy0zMi4zaDUxNi4yYzE3LjggMCAzMi4zIDE0LjQgMzIuMyAzMi4zVjc3OGMtMC4xIDc4LjMtNTcuOCAxNDEuOS0xMjguNyAxNDEuOXoiPjwvcGF0aD48L3N2Zz4=);
+}
+
+/* 关闭按钮的背景图片 */
+.pio-action .pio-close {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE1NS4yNTIgOTQzLjgyNWMtMTkuMjEzIDAtMzguNDI5LTcuMzMyLTUzLjA4OS0yMS45ODgtMjkuMzE3LTI5LjMyMS0yOS4zMTctNzYuODU1IDAtMTA2LjE3NWw3MTMuNDk0LTcxMy40OTRjMjkuMzE3LTI5LjMyMSA3Ni44NTMtMjkuMzIxIDEwNi4xNzUgMCAyOS4zMTcgMjkuMzE3IDI5LjMxNyA3Ni44NTUgMCAxMDYuMTc1bC03MTMuNDk0IDcxMy40OTRjLTE0LjY2IDE0LjY2LTMzLjg3NCAyMS45ODgtNTMuMDg5IDIxLjk4OHoiIGZpbGw9IiI+PC9wYXRoPjxwYXRoIGQ9Ik04NjguNzQ5IDk0My44MjRjLTE5LjIxMyAwLTM4LjQyOC03LjMzMi01My4wODktMjEuOTg4bC03MTMuNDk0LTcxMy40OTNjLTI5LjMxNy0yOS4zMTctMjkuMzE3LTc2Ljg1NyAwLTEwNi4xNzUgMjkuMzE2LTI5LjMxNyA3Ni44NTUtMjkuMzIxIDEwNi4xNzQgMGw3MTMuNDk0IDcxMy40OTJjMjkuMzE3IDI5LjMyMSAyOS4zMTcgNzYuODU1IDAgMTA2LjE3NS0xNC42NTcgMTQuNjYxLTMzLjg3MSAyMS45OTMtNTMuMDg3IDIxLjk5M3oiIGZpbGw9IiI+PC9wYXRoPjwvc3ZnPg==);
+}
+
+/* 皮肤按钮的背景图片 */
+.pio-action .pio-skin {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTk2NS45MTEgMzEwLjUzMWwtMTc0LjQtMTc0LjM5OGMtMTMuMDIyLTEzLjAyMS0zMC45MzMtMTkuNjQ5LTQ5LjM4MS0xOC4yMjgtMS43NC0wLjE1LTMuNDIyLTAuMjI0LTUuMDctMC4yMjRsLTkyLjkxNCAwLTYuNTE3IDMuNjI1Yy0zNC40MjEgMTkuMTQ2LTc4LjM0MSAyOS42ODktMTIzLjY2OCAyOS42ODktNDUuMzI4IDAtODkuMjQ2LTEwLjU0My0xMjMuNjY3LTI5LjY4OWwtNi41MTgtMy42MjVMMjkwLjg2IDExNy42ODFjLTIzLjY5MSAwLTQ0Ljk4NiAxMi45MjQtNTUuOTk1IDMzLjQ1MUw2Mi40NzcgMzIzLjUyMWMtMTEuOSAxMS44OTktMTguNDU0IDI3LjcyLTE4LjQ1NCA0NC41NDggMCAxNi44MjkgNi41NTQgMzIuNjQ5IDE4LjQ1MyA0NC41NDlsMTI1Ljk1MyAxMjUuOTU1YzEwLjU0IDEwLjUzOCAyNC4xNTcgMTYuODc4IDM4LjgyNiAxOC4xODFsMCAzMDQuMzk5YzAgMzUuMDczIDI4LjUzMyA2My42MDYgNjMuNjA0IDYzLjYwNmw0NDYuMTk5IDBjMzUuMDc0IDAgNjMuNjA3LTI4LjUzMyA2My42MDctNjMuNjA2bC0wLjAwMS0zMTcuMzQ1YzE0Ljg0NC0xLjIxMSAyOC42MzktNy41NzcgMzkuMjg4LTE4LjIyNEw5NjUuOTEgMzk5LjYyOEM5OTAuNDc1IDM3NS4wNjQgOTkwLjQ3NSAzMzUuMDk1IDk2NS45MTEgMzEwLjUzMXoiPjwvcGF0aD48L3N2Zz4=);
+}
+
+/* 信息按钮的背景图片 */
+.pio-action .pio-info {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTY4Mi45IDgyNS45SDI2Ny44Yy0yMS44IDAtMzkuNS0xNy43LTM5LjUtMzkuNXMxNy43LTM5LjUgMzkuNS0zOS41aDQxNS4xYzIxLjggMCAzOS41IDE3LjcgMzkuNSAzOS41cy0xNy43IDM5LjUtMzkuNSAzOS41ek04NjQuNyAxMDAuNGMtMTguNSAzLjctMzEuMyAyMC45LTMxLjMgMzkuN3Y2NDUuOGMwIDQ4LTM4LjkgODctODcgODdIMjE5LjNjLTE2LjQgMC0yOS42LTEzLjMtMjkuNi0yOS42VjczMi43YzAtMTYuMSAxMy4xLTI5LjIgMjkuMi0yOS4yaDM3NS45Yzg4LjEgMCAxNTkuNS03MS40IDE1OS41LTE1OS41VjE4NS41YzAtNjYuMi01My43LTExOS45LTExOS45LTExOS45aC00MDRjLTY2LjIgMC0xMTkuOSA1My43LTExOS45IDExOS45djY1Ny44YzAgNjAgNDguNyAxMDguNyAxMDguNyAxMDguN2g1MjcuMWM5MS43IDAgMTY2LjEtNzQuMyAxNjYuMS0xNjYuMVYxMzkuMWMwLjEtMjQuNi0yMi4yLTQzLjktNDcuNy0zOC43eiI+PC9wYXRoPjwvc3ZnPg==);
+}
+
+/* 句子按钮的背景图片 */
+.pio-action .pio-sentence {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTUxMiAyMDkuNDAzMjQxYy0yMDEuNzMxNTE0IDAtMzc0LjAwOTIwNiAxMjUuNDc2NzgzLTQ0My44MDg5MjIgMzAyLjU5Njc1OSA2OS43OTg2OTIgMTc3LjExOTk3NyAyNDIuMDc3NDA4IDMwMi41OTY3NTkgNDQzLjgwODkyMiAzMDIuNTk2NzU5IDIwMS45MzMxMDUgMCAzNzQuMDEwMjI5LTEyNS40NzY3ODMgNDQzLjgwODkyMi0zMDIuNTk2NzU5Qzg4Ni4wMDkyMDYgMzM0Ljg4MDAyMyA3MTMuOTMzMTA1IDIwOS40MDMyNDEgNTEyIDIwOS40MDMyNDF6TTUxMiA3MTMuNzMxNTE0Yy0xMTEuMzU1MTU3IDAtMjAxLjczMTUxNC05MC4zNzUzMzQtMjAxLjczMTUxNC0yMDEuNzMxNTE0czkwLjM3NTMzNC0yMDEuNzMxNTE0IDIwMS43MzE1MTQtMjAxLjczMTUxNCAyMDEuNzMxNTE0IDkwLjM3NTMzNCAyMDEuNzMxNTE0IDIwMS43MzE1MTRTNjIzLjM1NTE1NyA3MTMuNzMxNTE0IDUxMiA3MTMuNzMxNTE0ek01MTIgMzkwLjk2MTI5NmMtNjYuNzcyNzc2IDAtMTIxLjAzODcwNCA1NC4yNjU5MjgtMTIxLjAzODcwNCAxMjEuMDM4NzA0czU0LjI2NTkyOCAxMjEuMDM4NzA0IDEyMS4wMzg3MDQgMTIxLjAzODcwNCAxMjEuMDM4NzA0LTU0LjI2NTkyOCAxMjEuMDM4NzA0LTEyMS4wMzg3MDRTNTc4Ljc3Mjc3NiAzOTAuOTYxMjk2IDUxMiAzOTAuOTYxMjk2eiI+PC9wYXRoPjwvc3ZnPg==);
+}
+
+/* 对话框样式 */
+.pio-container .pio-dialog {
+    top: -4em; /* 距离顶部 -4em */
+    opacity: 0; /* 默认透明 */
+    z-index: 9999; /* 确保对话框在最上层 */
+    font-size: .8em; /* 字体大小 */
+    min-width: 12em; /* 最小宽度 */
+    background-color: rgba(236, 217, 188, .5); /* 背景颜色 */
+    padding: .75em 1em; /* 内边距 */
+    border-radius: 1em; /* 圆角 */
+    visibility: hidden; /* 默认隐藏 */
+    position: absolute; /* 绝对定位 */
+    word-break: break-all; /* 文本换行 */
+    border: 1px solid #eee; /* 边框 */
+    transition: opacity .3s, visibility .3s; /* 动画效果 */
+}
+
+/* 当对话框处于活动状态时 */
+.pio-container .pio-dialog.active {
+    opacity: 1; /* 完全不透明 */
+    visibility: visible; /* 可见 */
+}
+
+/* 对话框在左侧时的位置 */
+.pio-container.left .pio-dialog { left: 1em; }
+
+/* 对话框在右侧时的位置 */
+.pio-container.right .pio-dialog { right: 1em; }
+
+/* Live2D 模型垂直居中 */
+#pio { vertical-align: middle; }
+
+/* 响应式设计：屏幕宽度小于 768px 时的样式 */
+@media screen and (max-width: 768px) {
+    #pio { width: 8em; } /* 模型宽度 */
+    .pio-container { pointer-events: none; } /* 禁用所有指针事件 */
+}
+
+
